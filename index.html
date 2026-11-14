@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramadan</title>
+    <meta name="description" content="Récitations, recettes d’iftar, séries, documentaires et lives du Ramadan — en français, anglais et arabe.">
+    <link rel="icon" type="image/svg+xml" href="images/logo-mark.svg">
+
+    <!-- Arabic font (used when the site is in Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;500;600;700;800&display=swap">
+
+    <!-- libraries CSS -->
+    <link rel="stylesheet" href="assets/font/flaticon_ticstube.css">
+    <link rel="stylesheet" href="assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/vendor/swiper/swiper-bundle.min.css">
+
+    <!-- custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/dark.css">
+    <style>
+        /* ---------- SPA helpers ---------- */
+        .spa-view { min-height: 60vh; }
+        .tt-header-search-suggestion { display: none; }
+        .tt-header-search-suggestion.active { display: block; }
+        .tt-header-search-suggestion a.is-focused { background: rgba(255, 255, 255, .08); }
+        .spa-empty { padding: 60px 20px; text-align: center; opacity: .75; }
+        .spa-empty i { font-size: 42px; display: block; margin-bottom: 12px; }
+        /* ---------- YouTube content ---------- */
+        .spa-yt-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 16px; overflow: hidden; }
+        .spa-yt-frame.is-vertical { aspect-ratio: 9 / 16; border-radius: 0; height: 100%; }
+        .spa-yt-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .spa-yt-file img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.35); }
+        .spa-yt-file p { position: absolute; inset: 0; display: grid; place-content: center; gap: 10px; padding: 24px; margin: 0; text-align: center; color: #fff; font-weight: 600; }
+        .spa-yt-file a { color: #FBE7A6; }
+        /* thumbnails: crop YouTube's 4:3 images to the template's card shapes */
+        .spa-thumb { position: relative; }
+        .spa-thumb img { aspect-ratio: 295 / 175; object-fit: cover !important; display: block; }
+        .spa-yt-badge {
+            position: absolute; inset-inline-end: 10px; bottom: 10px; width: 34px; height: 34px; border-radius: 50%;
+            display: grid; place-items: center; background: rgba(0, 0, 0, .65); color: #fff; font-size: 13px;
+        }
+        .spa-short-thumb img { aspect-ratio: 216 / 280; object-fit: cover; display: block; }
+        .spa-live-thumb img { aspect-ratio: 270 / 457; object-fit: cover; display: block; width: 100%; }
+        .spa-popular-img img { object-fit: cover; width: 100%; height: 100%; }
+        .tt-video-horizontal .thumbnail img { object-fit: cover; }
+        .spa-year { font-weight: 700; color: #FBE7A6; }
+        .spa-year--2027 { color: #7fe3c4; }
+        /* video details: source box */
+        .spa-source { margin: 10px 0 30px; padding: 18px 20px; border-radius: 16px; background: rgba(255, 255, 255, .05); }
+        .spa-source dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0 0 14px; }
+        .spa-source dt { color: rgba(255, 255, 255, .6); font-weight: 500; }
+        .spa-source dd { margin: 0; color: #fff; }
+        /* keep slider cards at the template's size (YouTube thumbnails are larger) */
+        .swiper-slide .spa-thumb img { width: 295px; max-width: 100%; }
+        @media (max-width: 575px) { .swiper-slide .spa-thumb img { width: 240px; } }
+        /* hero: Ramadan night background instead of the template photo */
+        .tt-hero {
+            background:
+                radial-gradient(circle at 84.2% 24.5%, #13305a 0 41px, transparent 42px),
+                radial-gradient(circle at 82% 28%, rgba(251, 231, 166, .55) 0 46px, rgba(212, 175, 55, .18) 47px, transparent 140px),
+                radial-gradient(circle at 15% 120%, rgba(254, 82, 251, .25), transparent 55%),
+                linear-gradient(120deg, #07152a 0%, #10305a 55%, #3b1a63 100%);
+        }
+        .tt-hero::after {
+            content: ""; position: absolute; inset: 0; border-radius: 20px; z-index: -1; pointer-events: none; opacity: .12;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23FBE7A6' stroke-width='1'%3E%3Crect x='25' y='25' width='30' height='30'/%3E%3Crect x='25' y='25' width='30' height='30' transform='rotate(45 40 40)'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .tt-hero::before { background: linear-gradient(90deg, rgba(7, 21, 42, .85) 0%, rgba(7, 21, 42, 0) 70%); }
+        html[dir="rtl"] .tt-hero::before { background: linear-gradient(270deg, rgba(7, 21, 42, .85) 0%, rgba(7, 21, 42, 0) 70%); }
+
+        /* ---------- page header banner: Ramadan night instead of the template dragon ---------- */
+        .tt-breadcrumb-container {
+            overflow: hidden;
+            background:
+                /* crescent + star */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.35' r='.75'%3E%3Cstop offset='0' stop-color='%23FFF6D2'/%3E%3Cstop offset='1' stop-color='%23D4AF37'/%3E%3C/radialGradient%3E%3Cmask id='m'%3E%3Crect width='100' height='100' fill='white'/%3E%3Ccircle cx='60' cy='38' r='33' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx='45' cy='52' r='38' fill='url(%23g)' mask='url(%23m)'/%3E%3Cpath d='M78 46l2.6 6 6.4.6-4.9 4.3 1.5 6.3-5.6-3.4-5.6 3.4 1.5-6.3-4.9-4.3 6.4-.6z' fill='%23FBE7A6'/%3E%3C/svg%3E")
+                    no-repeat right 7% center / clamp(70px, 8vw, 120px),
+                /* hanging lanterns */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg stroke='%23D4AF37' stroke-width='1.5' fill='none'%3E%3Cpath d='M30 0v40M80 0v18'/%3E%3C/g%3E%3Cg fill='%23D4AF37'%3E%3Cpath d='M22 46Q30 36 38 46Z'/%3E%3Cpath d='M22 78H38L35 83H25Z'/%3E%3Cpath d='M72 24Q80 14 88 24Z'/%3E%3Cpath d='M72 56H88L85 61H75Z'/%3E%3C/g%3E%3Cg fill='%23FFC75A' stroke='%23D4AF37' stroke-width='1.5'%3E%3Cpath d='M21 47H39L43 62 38 78H22L17 62Z'/%3E%3Cpath d='M71 25H89L93 40 88 56H72L67 40Z'/%3E%3C/g%3E%3Cpath d='M30 47v31M17 62h26M80 25v31M67 40h26' stroke='%23B8860B' stroke-width='1' opacity='.7'/%3E%3C/svg%3E")
+                    no-repeat left 5% top / clamp(80px, 9vw, 130px) auto,
+                /* mosque skyline */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' preserveAspectRatio='none'%3E%3Cpath d='M0 80V62H40V50H46V62H70Q90 34 110 62H140V30L144 20 148 30V62H170Q210 8 250 62H262V40H268V62H300Q330 26 360 62H380V24L384 14 388 24V62H410Q440 36 470 62H500V48H506V62H540Q560 44 580 62H600V80Z' fill='%23050D1C' fill-opacity='.85'/%3E%3C/svg%3E")
+                    repeat-x left bottom / 600px 70px,
+                /* soft glow + night sky */
+                radial-gradient(circle at 92% 45%, rgba(212, 175, 55, .3), transparent 22%),
+                radial-gradient(circle at 10% 110%, rgba(254, 82, 251, .22), transparent 50%),
+                linear-gradient(120deg, #07152a 0%, #10305a 55%, #3b1a63 100%);
+        }
+        .tt-breadcrumb-container::before {
+            opacity: .1;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23FBE7A6' stroke-width='1'%3E%3Crect x='25' y='25' width='30' height='30'/%3E%3Crect x='25' y='25' width='30' height='30' transform='rotate(45 40 40)'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .tt-breadcrumb-title { text-shadow: 0 0 24px rgba(212, 175, 55, .35); }
+        .tt-breadcrumb-container a:hover { color: #FBE7A6; }
+        .spa-yt-link { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: #ff0033; color: #fff; font-weight: 600; }
+        .spa-yt-link:hover { color: #fff; filter: brightness(1.1); }
+        /* shorts */
+        .spa-short-col { display: flex; flex-direction: column; gap: 14px; }
+        .spa-yt-short { background: #000 !important; }
+        .spa-yt-short::before { display: none !important; }
+        .spa-short-info h6 { color: #fff; }
+        .spa-short-actions { margin-inline-start: 20px; }
+        .spa-short-actions .is-on { color: #fe52fb; }
+        .spa-round { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, .08); color: #fff; }
+        .spa-round:hover { color: #ff0033; }
+        [data-href] { cursor: pointer; }
+        .tt-video-details__heading .right button.is-on { color: #fe52fb; }
+        .spa-cat-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+        .padding-20 { padding: 20px; }
+
+        /* ---------- logo ---------- */
+        .rm-logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; line-height: 1; }
+        .rm-logo__mark {
+            width: 52px; height: 52px; flex-shrink: 0;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, .45));
+            transition: transform .4s ease, filter .4s ease;
+        }
+        .rm-logo:hover .rm-logo__mark { transform: rotate(-8deg) scale(1.05); filter: drop-shadow(0 0 16px rgba(255, 199, 90, .75)); }
+        .rm-logo__mark .rm-glow { animation: rm-glow 3.2s ease-in-out infinite; transform-origin: 46px 26px; }
+        @keyframes rm-glow { 0%, 100% { opacity: .85; } 50% { opacity: 1; } }
+        .rm-logo__text { display: flex; flex-direction: column; gap: 4px; }
+        .rm-logo__name {
+            font-family: 'Amiri', Georgia, serif; font-weight: 700; font-size: 32px; letter-spacing: .5px;
+            background: linear-gradient(180deg, #FBE7A6 0%, #D4AF37 60%, #B8860B 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .rm-logo__sub {
+            font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 13px; color: #e9dcae;
+            display: flex; align-items: center; gap: 6px; direction: rtl;
+        }
+        .rm-logo__sub::before, .rm-logo__sub::after { content: ""; width: 14px; height: 1px; background: rgba(212, 175, 55, .6); }
+        .rm-logo--sm .rm-logo__mark { width: 38px; height: 38px; }
+        .rm-logo--sm .rm-logo__name { font-size: 24px; }
+        .rm-logo--sm .rm-logo__sub { display: none; }
+        .rm-logo--lg .rm-logo__mark { width: 64px; height: 64px; }
+        .rm-logo--lg .rm-logo__name { font-size: 40px; }
+        .tt-sidebar.sidebar-collapsed .rm-logo__text { display: none; }
+        html[dir="rtl"] .rm-logo__name { letter-spacing: 0; }
+        @media (prefers-reduced-motion: reduce) { .rm-logo__mark .rm-glow { animation: none; } }
+
+        /* ---------- language switcher ---------- */
+        .tt-header__right { gap: 10px; }
+        .spa-lang {
+            display: inline-flex; flex-shrink: 0; padding: 3px; gap: 2px;
+            border-radius: 999px; background: rgba(255, 255, 255, .08);
+        }
+        .spa-lang button {
+            min-width: 38px; height: 34px; padding: 0 10px; border: 0; border-radius: 999px;
+            background: transparent; color: #cfcfcf; font-weight: 700; font-size: 13px; line-height: 1;
+        }
+        .spa-lang button[aria-pressed="true"] { background: linear-gradient(90deg, #0048FF, #FE52FB); color: #fff; }
+        .spa-lang .ar { font-family: 'Cairo', sans-serif; font-size: 15px; }
+
+        /* ---------- Arabic / right-to-left ---------- */
+        html[dir="rtl"] { --font-inter: 'Cairo', sans-serif; --font-barlow: 'Cairo', sans-serif; }
+        html[dir="rtl"] body { font-family: 'Cairo', sans-serif; }
+        html[dir="rtl"] .flaticon-right-arrow,
+        html[dir="rtl"] .flaticon-left-arrow,
+        html[dir="rtl"] .flaticon-play-button-arrowhead { display: inline-block; transform: scaleX(-1); }
+        html[dir="rtl"] .tt-hero .tt-hero-slider-pagination { right: auto; left: clamp(10px, 2.1vw, 40px); }
+        html[dir="rtl"] .tt-header__search input { text-align: right; }
+        html[dir="rtl"] .tt-video__infos span + span { border-left: 0; }
+        html[dir="rtl"] .tt-breadcrumb-title,
+        html[dir="rtl"] .tt-hero__title,
+        html[dir="rtl"] .tt-video-details__inner-title { letter-spacing: 0; text-transform: none; }
+        @media screen and (max-width: 991px) {
+            html[dir="rtl"] .tt-sidebar { right: 0; transform: translateX(100%); }
+            html[dir="rtl"] .tt-sidebar.active { transform: translateX(0); }
+        }
+        @media screen and (max-width: 575px) {
+            .spa-lang button { min-width: 32px; padding: 0 7px; }
+        }
+    </style>
+
+    <!-- ================= Ramadan tools (prayer times, card, tasbih, tracker) ================= -->
+    <style>
+        #ecosystem-promo-bar { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: linear-gradient(90deg, #0d2a4a, #1b3f6b 50%, #0d2a4a); border-bottom: 1px solid rgba(212, 175, 55, .25); font-size: 13.5px; font-weight: 600; }
+        #promo-link { flex: 1; text-align: center; color: #f3d88a; }
+        #promo-link:hover { text-decoration: underline; }
+        #promo-close { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .08); color: #ccc; font-size: 11px; }
+        .spa-tools-nav { margin-top: 26px; }
+        .spa-tools-nav .tt-sidebar__nav-title { color: #f3d88a; margin-bottom: 14px; }
+
+        .rc { --g: #D4AF37; --g2: #f3d88a; --gd: #9c7a1a; --tx: #f5f0e1; --mu: #a9b6c8; --line: rgba(212, 175, 55, .18); --line2: rgba(212, 175, 55, .42); --night: #c9d6ff; color: var(--tx); }
+        .rc *, .rc *::before, .rc *::after { box-sizing: border-box; }
+        .rc h2, .rc h3, .rc p { margin: 0; }
+        .rc button { font: inherit; cursor: pointer; }
+        .rc svg { display: block; }
+        .rc-narrow { max-width: 640px; margin-inline: auto; }
+        .rc-section-head { margin: 6px 4px 18px; }
+        .rc-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.6px; color: var(--g); margin-bottom: 6px; }
+        .rc-eyebrow::before { content: ""; width: 8px; height: 8px; background: var(--g); transform: rotate(45deg); box-shadow: 0 0 10px var(--g); }
+        .rc-section-head h2 { font-family: 'Amiri', serif; font-size: clamp(28px, 4vw, 40px); font-weight: 700; color: #fff; }
+        .rc-section-head p { color: var(--mu); margin-top: 6px; }
+        html[dir="rtl"] .rc-eyebrow { letter-spacing: 0; }
+        .rc-panel { background: rgba(255, 255, 255, .04); border: 1px solid var(--line); border-radius: 22px; padding: 18px; }
+        .rc-stack { display: grid; gap: 16px; }
+        .rc-muted { color: var(--mu); font-size: 13px; }
+        .rc-chip { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); font-size: 13.5px; font-weight: 600; white-space: nowrap; max-width: 100%; color: #fff; }
+        .rc-chip svg { width: 16px; height: 16px; fill: none; stroke: var(--g); stroke-width: 2; }
+        .rc-chip--gold { color: var(--g2); }
+
+        /* countdown hero */
+        .rc-hero { position: relative; overflow: hidden; padding: 20px; border-radius: 24px; border: 1px solid var(--line2); text-align: center; margin-bottom: 22px; transition: background .8s;
+            background: radial-gradient(120% 80% at 50% 0%, rgba(212, 175, 55, .18), transparent 60%), linear-gradient(180deg, #0f3a32, #0a2722 55%, #071c19); }
+        .rc-hero[data-mode="suhoor"] { background: radial-gradient(120% 80% at 50% 0%, rgba(140, 160, 255, .16), transparent 60%), linear-gradient(180deg, #13204a, #0c1735 55%, #08112a); border-color: rgba(170, 185, 255, .3); }
+        .rc-hero-top { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+        .rc-greg { margin-top: 12px !important; color: var(--mu); font-size: 13.5px; }
+        .rc-badge { display: inline-block; margin-top: 10px !important; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #1c1503; background: linear-gradient(135deg, var(--g2), var(--g)); }
+        .rc-moon { width: 84px; height: 84px; margin: 14px auto 2px; filter: drop-shadow(0 0 22px rgba(212, 175, 55, .65)); animation: rc-float 6s ease-in-out infinite; }
+        .rc-hero[data-mode="suhoor"] .rc-moon { filter: drop-shadow(0 0 26px rgba(220, 230, 255, .6)) saturate(.6) brightness(1.15); }
+        @keyframes rc-float { 50% { transform: translateY(-6px) rotate(3deg); } }
+        .rc-cd-label { margin-top: 6px !important; font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--g2); }
+        html[dir="rtl"] .rc-cd-label { letter-spacing: 0; font-size: 17px; }
+        .rc-hero[data-mode="suhoor"] .rc-cd-label { color: var(--night); }
+        .rc-countdown { display: flex; justify-content: center; align-items: flex-start; gap: clamp(4px, 2vw, 14px); margin-top: 6px; }
+        .rc-unit { display: flex; flex-direction: column; align-items: center; }
+        .rc-num { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: clamp(52px, 9vw, 112px); line-height: 1.05; font-variant-numeric: tabular-nums; color: #fbe7a6; text-shadow: 0 0 18px rgba(212, 175, 55, .65), 0 0 46px rgba(212, 175, 55, .35); }
+        .rc-hero[data-mode="suhoor"] .rc-num { color: #e6ecff; text-shadow: 0 0 18px rgba(150, 170, 255, .6), 0 0 46px rgba(120, 140, 255, .35); }
+        .rc-sep { font-size: clamp(40px, 7vw, 84px); font-weight: 700; line-height: 1.1; color: var(--g); opacity: .55; animation: rc-blink 1s steps(2, start) infinite; }
+        @keyframes rc-blink { to { opacity: .15; } }
+        .rc-cap { margin-top: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.4px; color: var(--mu); }
+        .rc-target { margin-top: 12px !important; font-size: 15px; font-weight: 600; }
+        .rc-fp { max-width: 460px; margin: 18px auto 0; }
+        .rc-fp-track { position: relative; height: 8px; border-radius: 99px; background: rgba(255, 255, 255, .08); }
+        .rc-fp-fill { position: absolute; inset-block: 0; inset-inline-start: 0; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--gd), var(--g), var(--g2)); transition: width 1s linear; }
+        .rc-fp-dot { position: absolute; top: 50%; inset-inline-start: 0; width: 16px; height: 16px; margin-inline-start: -8px; transform: translateY(-50%); border-radius: 50%; background: #fff6d6; box-shadow: 0 0 0 4px rgba(212, 175, 55, .25), 0 0 16px var(--g); transition: inset-inline-start 1s linear; }
+        .rc-hero[data-mode="suhoor"] .rc-fp-fill { background: linear-gradient(90deg, #4b5fb8, #8ea2ff, #dfe6ff); }
+        .rc-fp-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--mu); }
+        .rc-dua { display: grid; gap: 4px; margin: 16px auto 0; max-width: 520px; padding: 12px 16px; border-radius: 14px; background: rgba(212, 175, 55, .1); border: 1px solid var(--line2); color: var(--g2); }
+        .rc-dua span { font-family: 'Amiri', serif; font-size: 20px; color: #fff; line-height: 1.7; }
+        .rc-status { margin-top: 12px !important; min-height: 1em; font-size: 13px; color: var(--mu); }
+        .rc-status.is-error { color: #ef8a7f; }
+        .rc-status button { margin-inline-start: 6px; padding: 2px 10px; border-radius: 99px; border: 1px solid var(--line2); background: none; color: var(--g2); font-size: 12px; font-weight: 700; }
+
+        /* prayer list */
+        .rc-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+        .rc-panel-head h2 { font-family: 'Amiri', serif; font-size: 26px; color: #fff; }
+        .rc-prayers { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(5, 1fr); }
+        .rc-prayer { display: grid; justify-items: center; text-align: center; gap: 8px; padding: 16px 8px; border-radius: 14px; background: rgba(255, 255, 255, .03); border: 1px solid transparent; }
+        .rc-p-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: rgba(212, 175, 55, .1); color: var(--g); }
+        .rc-p-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .rc-p-name { font-weight: 700; display: flex; flex-direction: column; align-items: center; color: #fff; }
+        .rc-p-sub { font-size: 12px; font-weight: 600; color: var(--mu); }
+        .rc-p-time { font-weight: 800; font-size: 18px; color: #fff; font-variant-numeric: tabular-nums; }
+        .rc-prayer.is-next { background: linear-gradient(135deg, rgba(212, 175, 55, .2), rgba(212, 175, 55, .06)); border-color: var(--line2); }
+        .rc-prayer.is-next .rc-p-icon { background: var(--g); color: #1c1503; box-shadow: 0 0 18px rgba(212, 175, 55, .6); }
+        .rc-prayer.is-next .rc-p-time, .rc-prayer.is-next .rc-p-sub { color: var(--g2); }
+        .rc-prayer.is-past { opacity: .55; }
+        @media (max-width: 767px) {
+            .rc-prayers { grid-template-columns: 1fr; }
+            .rc-prayer { grid-template-columns: 40px 1fr auto; justify-items: start; text-align: start; padding: 11px 14px; gap: 12px; align-items: center; }
+            .rc-p-name { align-items: flex-start; }
+        }
+
+        /* home countdown banner */
+        .rc-mini { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; padding: 12px 18px; margin-bottom: 18px; border-radius: 16px; border: 1px solid rgba(212, 175, 55, .35); background: linear-gradient(90deg, rgba(212, 175, 55, .16), rgba(212, 175, 55, .03)); color: #fff; }
+        .rc-mini[data-mode="suhoor"] { border-color: rgba(170, 185, 255, .35); background: linear-gradient(90deg, rgba(140, 160, 255, .16), rgba(140, 160, 255, .03)); }
+        .rc-mini:hover { color: #fff; border-color: #D4AF37; }
+        .rc-mini__moon { font-size: 22px; }
+        .rc-mini__label { font-weight: 600; }
+        .rc-mini__time { font-family: 'Cairo', sans-serif; font-size: 24px; font-weight: 800; color: #fbe7a6; font-variant-numeric: tabular-nums; text-shadow: 0 0 14px rgba(212, 175, 55, .5); }
+        .rc-mini__loc { color: #a9b6c8; font-size: 13px; }
+        .rc-mini__badge { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; color: #1c1503; background: linear-gradient(135deg, #f3d88a, #D4AF37); }
+        .rc-mini__go { margin-inline-start: auto; color: #f3d88a; font-weight: 600; font-size: 14px; }
+
+        /* buttons & fields */
+        .rc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 999px; border: 1px solid transparent; font-weight: 700; font-size: 15px; transition: transform .15s; color: #fff; }
+        .rc-btn:active { transform: scale(.97); }
+        .rc-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+        .rc-btn--gold { color: #1c1503; background: linear-gradient(135deg, #f7e3a1, #D4AF37 55%, #b8901f); box-shadow: 0 10px 26px -10px rgba(212, 175, 55, .85); }
+        .rc-btn--ghost { background: rgba(255, 255, 255, .05); border-color: var(--line); }
+        .rc-btn--wa { background: #1fa855; }
+        .rc-btn--sm { min-height: 40px; font-size: 13.5px; justify-self: center; }
+        .rc-btn--block { width: 100%; }
+        .rc-btn[disabled] { opacity: .6; pointer-events: none; }
+        .rc-field { display: grid; gap: 7px; margin: 0; padding: 0; border: 0; min-width: 0; }
+        .rc-field > span, .rc-field > legend { font-size: 13px; font-weight: 700; color: var(--mu); padding: 0; float: none; width: auto; margin: 0; line-height: 1.4; }
+        fieldset.rc-field > legend { margin-bottom: 7px; }
+        .rc input[type="text"], .rc select, .rc textarea { width: 100%; min-height: 48px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0, 0, 0, .35); color: #fff; font-size: 16px; appearance: none; -webkit-appearance: none; }
+        .rc select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-size: 18px; background-position: right 14px center; padding-inline-end: 42px; }
+        html[dir="rtl"] .rc select { background-position: left 14px center; }
+        .rc select option { background: #0e1a2b; color: #fff; }
+        .rc textarea { resize: vertical; min-height: 90px; }
+        .rc input::placeholder, .rc textarea::placeholder { color: rgba(169, 182, 200, .6); }
+        .rc input:focus, .rc select:focus, .rc textarea:focus { outline: none; border-color: var(--g); box-shadow: 0 0 0 3px rgba(212, 175, 55, .18); }
+        .rc-seg { display: flex; padding: 4px; gap: 4px; border-radius: 999px; background: rgba(0, 0, 0, .3); border: 1px solid var(--line); }
+        .rc-seg button { flex: 1; min-height: 38px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--mu); font-weight: 700; font-size: 14px; }
+        .rc-seg button[aria-pressed="true"] { background: linear-gradient(135deg, var(--g2), var(--g)); color: #1c1503; }
+        .rc-icon-btn { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); background: rgba(255, 255, 255, .05); }
+        .rc-icon-btn svg { width: 20px; height: 20px; fill: none; stroke: var(--g2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        #rc-mute .ic-off, #rc-mute[aria-pressed="true"] .ic-on { display: none; }
+        #rc-mute[aria-pressed="true"] .ic-off { display: block; }
+
+        /* greeting card */
+        .rc-card-maker { display: grid; gap: 18px; }
+        @media (min-width: 992px) { .rc-card-maker { grid-template-columns: 1fr 1fr; align-items: start; } .rc-card-preview { position: sticky; top: 20px; } }
+        .rc-card-preview { display: grid; place-items: center; padding: 14px; border-radius: 22px; background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, .15), transparent 70%), rgba(0, 0, 0, .3); border: 1px solid var(--line); }
+        #rc-canvas { display: block; width: 100%; max-width: 440px; height: auto; border-radius: 14px; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .8), 0 0 0 1px rgba(212, 175, 55, .25); background: #0a2722; }
+        .rc-card-preview.is-story #rc-canvas { max-width: min(330px, 100%); }
+        .rc-card-controls { display: grid; gap: 16px; }
+        .rc-theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .rc-theme { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 10px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0, 0, 0, .25); font-size: 13px; font-weight: 600; text-align: start; color: #fff; }
+        .rc-theme[aria-pressed="true"] { border-color: var(--g); background: rgba(212, 175, 55, .12); box-shadow: 0 0 0 1px var(--g) inset; }
+        .rc-sw { width: 30px; height: 30px; flex: none; border-radius: 9px; border: 1.5px solid rgba(255, 255, 255, .25); }
+        .rc-sw--emerald { background: radial-gradient(circle at 70% 30%, #D4AF37 0 22%, transparent 24%), linear-gradient(135deg, #0a5a47, #03271f); }
+        .rc-sw--midnight { background: radial-gradient(circle at 70% 30%, #e9d8a6 0 20%, transparent 22%), linear-gradient(135deg, #1a2a6c, #070b24); }
+        .rc-sw--lantern { background: radial-gradient(circle at 50% 55%, #ffd36b 0 20%, transparent 26%), linear-gradient(135deg, #6e1830, #2a0815); }
+        .rc-sw--desert { background: linear-gradient(180deg, #2d1846, #8a3a6a 55%, #f0954a); }
+        .rc-card-actions { display: grid; gap: 10px; }
+        .rc-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* tasbih */
+        .rc-dhikr-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+        .rc-dhikr-chip { flex: none; display: flex; flex-direction: column; align-items: center; padding: 8px 14px; border-radius: 16px; border: 1px solid var(--line); background: rgba(0, 0, 0, .25); color: #fff; }
+        .rc-dhikr-chip .ar { font-family: 'Amiri', serif; font-size: 18px; line-height: 1.3; }
+        .rc-dhikr-chip .tr { font-size: 11.5px; font-weight: 600; color: var(--mu); }
+        .rc-dhikr-chip[aria-pressed="true"] { border-color: var(--g); background: rgba(212, 175, 55, .14); }
+        .rc-dhikr-ar { font-family: 'Amiri', serif; font-size: clamp(32px, 5vw, 44px); line-height: 1.5; color: var(--g2); text-align: center; text-shadow: 0 0 22px rgba(212, 175, 55, .4); }
+        .rc-dhikr-tr { color: var(--mu); font-size: 14px; text-align: center; }
+        .rc-tasbih-wrap { display: grid; place-items: center; padding: 6px 0; }
+        .rc-tasbih-btn { position: relative; width: min(74vw, 280px); aspect-ratio: 1; border: 0; border-radius: 50%; padding: 0; overflow: hidden; touch-action: manipulation; user-select: none; -webkit-user-select: none; transition: transform .09s;
+            background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, .14), transparent 45%), radial-gradient(circle, #15453c, #0a2420 70%);
+            box-shadow: 0 26px 50px -18px rgba(0, 0, 0, .85), 0 0 0 10px rgba(212, 175, 55, .05), inset 0 -10px 24px rgba(0, 0, 0, .45); }
+        .rc-tasbih-btn.is-pressed { transform: scale(.965); }
+        .rc-tasbih-btn.is-complete { box-shadow: 0 0 0 10px rgba(212, 175, 55, .2), 0 0 60px rgba(212, 175, 55, .55); }
+        .rc-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+        .rc-ring circle { fill: none; stroke-width: 9; }
+        .rc-ring .bg { stroke: rgba(255, 255, 255, .07); }
+        .rc-ring .fg { stroke: url(#rcRingGrad); stroke-linecap: round; stroke-dasharray: 753.98; stroke-dashoffset: 753.98; transition: stroke-dashoffset .25s; filter: drop-shadow(0 0 6px rgba(212, 175, 55, .7)); }
+        .rc-tasbih-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+        .rc-count { font-family: 'Cairo', sans-serif; font-size: clamp(60px, 10vw, 82px); font-weight: 800; line-height: 1; color: #fbe7a6; text-shadow: 0 0 22px rgba(212, 175, 55, .5); font-variant-numeric: tabular-nums; }
+        .rc-count.bump { animation: rc-bump .18s; }
+        @keyframes rc-bump { 40% { transform: scale(1.12); } }
+        .rc-target-txt { font-size: 16px; font-weight: 700; color: var(--mu); margin-top: 4px; }
+        .rc-hint { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(212, 175, 55, .6); margin-top: 10px; }
+        html[dir="rtl"] .rc-hint { letter-spacing: 0; }
+        .rc-ripples { position: absolute; inset: 0; pointer-events: none; }
+        .rc-ripple { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; background: radial-gradient(circle, rgba(247, 227, 161, .55), transparent 70%); animation: rc-ripple .6s ease-out forwards; }
+        @keyframes rc-ripple { to { transform: scale(9); opacity: 0; } }
+        .rc-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .rc-meta div { display: grid; justify-items: center; padding: 10px; border-radius: 14px; background: rgba(0, 0, 0, .25); border: 1px solid var(--line); }
+        .rc-meta b { font-size: 22px; color: var(--g2); }
+        .rc-meta small { font-size: 12px; color: var(--mu); }
+        .rc-controls { display: flex; align-items: center; gap: 10px; }
+        .rc-controls .rc-seg { flex: 1; }
+
+        /* tracker */
+        .rc-progress-head { display: flex; align-items: center; gap: 14px; }
+        .rc-big { font-family: 'Cairo', sans-serif; font-size: 40px; font-weight: 800; line-height: 1; color: var(--g2); min-width: 2.6em; }
+        .rc-track { height: 12px; border-radius: 99px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+        .rc-fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #1f8f6e, var(--g) 70%, var(--g2)); transition: width .6s; }
+        .rc-items { display: grid; gap: 8px; }
+        .rc-item { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0, 0, 0, .25); text-align: start; color: #fff; }
+        .rc-item .ic, .rc-group-head .ic { font-size: 22px; width: 30px; text-align: center; flex: none; }
+        .rc-item .lb, .rc-group-head .lb { flex: 1; font-weight: 600; }
+        .rc-check { width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 8px; border: 2px solid var(--line2); }
+        .rc-check svg { width: 16px; height: 16px; fill: none; stroke: #1c1503; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+        .rc-item[aria-pressed="true"] { background: rgba(95, 208, 160, .08); border-color: rgba(95, 208, 160, .35); }
+        .rc-item[aria-pressed="true"] .rc-check { background: var(--g); border-color: var(--g); }
+        .rc-item[aria-pressed="true"] .rc-check svg { opacity: 1; }
+        .rc-item[aria-pressed="true"] .lb { color: var(--g2); }
+        .rc-group { padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0, 0, 0, .25); display: grid; gap: 10px; }
+        .rc-group-head { display: flex; align-items: center; gap: 12px; color: #fff; }
+        .rc-count-sm { font-size: 13px; font-weight: 800; color: var(--g2); }
+        .rc-pchips { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .rc-pchip { min-height: 40px; padding: 4px 2px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255, 255, 255, .03); font-size: 12.5px; font-weight: 700; color: var(--mu); }
+        .rc-pchip[aria-pressed="true"] { background: var(--g); border-color: var(--g); color: #1c1503; }
+        .rc-stepper { display: flex; align-items: center; gap: 10px; }
+        .rc-stepper button { width: 40px; height: 40px; flex: none; border-radius: 50%; border: 1px solid var(--line2); background: rgba(212, 175, 55, .08); color: var(--g2); font-size: 22px; font-weight: 700; line-height: 1; }
+        .rc-stepper .v { min-width: 3ch; text-align: center; font-size: 22px; font-weight: 800; color: #fff; }
+        .rc-stepper .goal { flex: 1; font-size: 12.5px; color: var(--mu); }
+        .rc-mini-track { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+        .rc-mini-fill { height: 100%; background: linear-gradient(90deg, var(--gd), var(--g2)); transition: width .4s; }
+        .rc-week h3 { font-size: 13px; font-weight: 700; color: var(--mu); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.2px; }
+        .rc-week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; }
+        .rc-wday { display: grid; justify-items: center; gap: 6px; }
+        .rc-wbar { position: relative; width: 100%; max-width: 34px; height: 64px; border-radius: 10px; background: rgba(255, 255, 255, .05); overflow: hidden; }
+        .rc-wbar i { position: absolute; inset-inline: 0; bottom: 0; border-radius: inherit; background: linear-gradient(180deg, var(--g2), var(--gd)); }
+        .rc-wday small { font-size: 11px; font-weight: 700; color: var(--mu); text-transform: capitalize; }
+        .rc-wday.is-today small { color: var(--g2); }
+        .rc-wday.is-today .rc-wbar { box-shadow: 0 0 0 1.5px var(--g); }
+
+        /* location sheet & toast */
+        .rc-sheet { width: min(calc(100% - 24px), 480px); max-height: 92vh; padding: 0; border: 1px solid var(--line2); border-radius: 26px; background: linear-gradient(180deg, #12253f, #0a1628); color: #fff; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+        .rc-sheet::backdrop { background: rgba(2, 8, 16, .7); }
+        .rc-sheet form { display: grid; gap: 14px; padding: 22px 18px; }
+        .rc-sheet h3 { font-family: 'Amiri', serif; font-size: 26px; text-align: center; color: #fff; }
+        .rc-or { display: flex; align-items: center; gap: 12px; color: var(--mu); font-size: 13px; font-weight: 600; }
+        .rc-or::before, .rc-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+        .rc-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .rc-dialog-actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 4px; }
+        .rc-toast { position: fixed; z-index: 9999; left: 50%; bottom: 110px; transform: translate(-50%, 20px); max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 14px; background: #f5e6b3; color: #1c1503; font-weight: 700; font-size: 14px; text-align: center; box-shadow: 0 16px 40px -10px rgba(0, 0, 0, .7); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; }
+        .rc-toast.show { opacity: 1; transform: translate(-50%, 0); }
+        @media (max-width: 400px) { .rc-theme-grid, .rc-row2, .rc-field-row { grid-template-columns: 1fr; } }
+        @media (prefers-reduced-motion: reduce) { .rc *, .rc-mini * { animation: none !important; transition: none !important; } }
+
+        /* ---------- Ko-fi donation popup (link set in app.js → RC.donateUrl) ---------- */
+        .kofi-ic { width: 20px; height: 20px; flex: none; }
+        .kofi-fab {
+            position: fixed; z-index: 90; bottom: 24px; inset-inline-end: 24px;
+            display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 18px 0 14px;
+            border: 0; border-radius: 999px; color: #fff; font-weight: 700; font-size: 14px;
+            background: linear-gradient(135deg, #ff5e5b, #ff8a5c);
+            box-shadow: 0 10px 26px -8px rgba(255, 94, 91, .75);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .kofi-fab:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -8px rgba(255, 94, 91, .9); }
+        .kofi-fab:focus-visible, .kofi-btn:focus-visible, .kofi-close:focus-visible { outline: 3px solid #ffd2b8; outline-offset: 3px; }
+        .kofi-fab .kofi-ic { animation: kofi-beat 2.6s ease-in-out infinite; }
+        @keyframes kofi-beat { 0%, 70%, 100% { transform: scale(1); } 78% { transform: scale(1.18); } 86% { transform: scale(.95); } }
+        .kofi-pop {
+            position: fixed; z-index: 95; bottom: 82px; inset-inline-end: 24px;
+            width: min(320px, calc(100vw - 32px)); padding: 22px 20px 18px; text-align: center;
+            border-radius: 20px; border: 1px solid rgba(255, 94, 91, .35); color: #f6e9e2;
+            background: radial-gradient(120% 70% at 50% 0%, rgba(255, 94, 91, .22), transparent 60%), linear-gradient(180deg, #2b1c19, #1a1110);
+            box-shadow: 0 24px 60px -12px rgba(0, 0, 0, .8);
+            transform-origin: bottom right;
+        }
+        html[dir="rtl"] .kofi-pop { transform-origin: bottom left; }
+        .kofi-pop:not([hidden]) { animation: kofi-in .22s ease-out; }
+        @keyframes kofi-in { from { opacity: 0; transform: translateY(8px) scale(.96); } }
+        .kofi-close {
+            position: absolute; top: 10px; inset-inline-end: 10px; width: 32px; height: 32px;
+            display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .08); color: #fff;
+            transition: background .2s;
+        }
+        .kofi-close:hover { background: rgba(255, 255, 255, .16); }
+        .kofi-close svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+        .kofi-cup { width: 52px; height: 52px; margin: 0 auto 10px; display: grid; place-items: center; border-radius: 16px; color: #fff; background: linear-gradient(135deg, #ff5e5b, #ff8a5c); box-shadow: 0 8px 20px -6px rgba(255, 94, 91, .7); }
+        .kofi-cup .kofi-ic { width: 28px; height: 28px; }
+        .kofi-cup .kofi-ic path:last-child { fill: #ff5e5b; }
+        .kofi-title { font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 8px; }
+        .kofi-text { font-size: 14px; line-height: 1.55; margin: 0 0 16px; color: #e9d6cc; }
+        .kofi-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; padding: 0 16px;
+            border-radius: 999px; font-weight: 800; font-size: 15px; color: #fff !important;
+            background: linear-gradient(135deg, #ff5e5b, #ff8a5c); box-shadow: 0 10px 24px -10px rgba(255, 94, 91, .9);
+            transition: transform .2s ease, filter .2s ease;
+        }
+        .kofi-btn:hover { transform: translateY(-2px); filter: brightness(1.06); }
+        .kofi-btn .kofi-ic path:last-child { fill: #ff5e5b; }
+        .kofi-ext { opacity: .8; font-weight: 700; }
+        .kofi-note { margin: 12px 0 0; font-size: 11.5px; line-height: 1.5; color: #b9a39a; }
+        @media (max-width: 767px) {
+            .kofi-fab { bottom: 104px; inset-inline-end: 16px; height: 42px; padding: 0 14px 0 12px; font-size: 13px; }
+            .kofi-pop { bottom: 156px; inset-inline-end: 16px; }
+        }
+        @media (prefers-reduced-motion: reduce) { .kofi-fab .kofi-ic, .kofi-pop:not([hidden]) { animation: none; } .kofi-fab, .kofi-btn { transition: none; } }
+    </style>
+</head>
+
+<body class="dark-mode">
+    <!-- logo mark, drawn once and reused with <use href="#rm-mark"> -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <linearGradient id="rm-gold" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#FBE7A6"/>
+                <stop offset=".55" stop-color="#D4AF37"/>
+                <stop offset="1" stop-color="#A97E12"/>
+            </linearGradient>
+            <radialGradient id="rm-light" cx=".5" cy=".45" r=".6">
+                <stop offset="0" stop-color="#FFF6D2"/>
+                <stop offset=".55" stop-color="#FFC75A"/>
+                <stop offset="1" stop-color="#E08A12"/>
+            </radialGradient>
+            <mask id="rm-cut">
+                <rect width="64" height="64" fill="#fff"/>
+                <circle cx="37" cy="28" r="18" fill="#000"/>
+            </mask>
+        </defs>
+        <symbol id="rm-mark" viewBox="0 0 64 64">
+            <circle cx="26" cy="36" r="21" fill="url(#rm-gold)" mask="url(#rm-cut)"/>
+            <path d="M46 4v9" stroke="#D4AF37" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M40.6 17.4Q46 10.6 51.4 17.4Z" fill="url(#rm-gold)"/>
+            <g class="rm-glow">
+                <path d="M41.2 18H50.8L53 25.2 50.4 33H41.6L39 25.2Z" fill="url(#rm-light)" stroke="#D4AF37" stroke-width="1.3" stroke-linejoin="round"/>
+                <path d="M46 18v15M39 25.2h14" stroke="#B8860B" stroke-width=".9" opacity=".7"/>
+            </g>
+            <path d="M41.6 33h8.8l-1.7 3.2h-5.4Z" fill="url(#rm-gold)"/>
+            <path d="M45.2 36.2 46 39.6 46.8 36.2Z" fill="#D4AF37"/>
+            <path d="M55 43l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9Z" fill="#FBE7A6"/>
+        </symbol>
+    </svg>
+    <!-- mobile fixed nav -->
+    <nav class="tt-mobile-nav" id="mobile-nav">
+        <a href="#/" data-route="home"><i class="flaticon-home"></i><span data-i18n="home">Accueil</span></a>
+        <a href="#/prayer" data-route="prayer"><i class="flaticon-history-clock-button"></i><span data-i18n="navPrayer">Horaires</span></a>
+        <a href="#/shorts" data-route="shorts"><i class="flaticon-play-button-arrowhead"></i><span data-i18n="shorts">Shorts</span></a>
+        <a href="#/card" data-route="card"><i class="flaticon-new-post"></i><span data-i18n="navCard">Carte</span></a>
+        <a href="#/tasbih" data-route="tasbih"><i class="flaticon-plus-button"></i><span data-i18n="navTasbih">Tasbih</span></a>
+    </nav>
+
+    <!-- cross-promotion bar (link set in app.js → RC.promoUrl) -->
+    <div id="ecosystem-promo-bar">
+        <!--
+        <a id="promo-link" href="#" target="_blank" rel="noopener" data-i18n="promo">🌙 Découvrez nos autres applications gratuites →</a>
+        <button type="button" id="promo-close" data-i18n-aria="closePromo" aria-label="Fermer"><i class="flaticon-close"></i></button>
+        -->
+    </div>
+
+    <div class="tt-overlay"></div>
+
+    <!-- container -->
+    <div class="tt-container">
+        <!-- left sidebar -->
+        <aside class="tt-container__left tt-sidebar">
+            <div class="tt-sidebar__heading d-flex justify-content-between align-items-center">
+                <a href="#/" class="rm-logo" aria-label="Ramadan — رمضان كريم">
+                    <svg class="rm-logo__mark" aria-hidden="true"><use href="#rm-mark"/></svg>
+                    <span class="rm-logo__text">
+                        <span class="rm-logo__name">Ramadan</span>
+                        <span class="rm-logo__sub">رمضان كريم</span>
+                    </span>
+                </a>
+                <button class="tt-sidebar-collapse-btn d-none" data-i18n-aria="menu" aria-label="Menu"><i class="flaticon-menu"></i></button>
+            </div>
+
+            <div class="tt-sidebar__nav">
+                <a href="#/" data-route="home">
+                    <div class="d-flex align-items-baseline gap-2">
+                        <i class="flaticon-home"></i>
+                        <span class="to-collapse" data-i18n="home">Accueil</span>
+                    </div>
+                    <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                </a>
+                <a href="#/category" data-route="category">
+                    <div class="d-flex align-items-baseline gap-2">
+                        <i class="flaticon-play-button-arrowhead"></i>
+                        <span class="to-collapse" data-i18n="movies">Vidéos</span>
+                    </div>
+                    <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                </a>
+                <a href="#/shorts" data-route="shorts">
+                    <div class="d-flex align-items-baseline gap-2">
+                        <i class="flaticon-video-player"></i>
+                        <span class="to-collapse" data-i18n="shorts">Shorts</span>
+                    </div>
+                    <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                </a>
+                <div class="tt-sidebar-nav-dropdown to-collapse">
+                    <a href="#">
+                        <div class="d-flex align-items-baseline gap-2">
+                            <i class="flaticon-playlist"></i>
+                            <span class="to-collapse" data-i18n="categories">Catégories</span>
+                        </div>
+                        <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                    </a>
+                    <!-- filled by app.js -->
+                    <ul class="tt-sidebar-nav-dropdown-menu" id="sidebar-categories"></ul>
+                </div>
+            </div>
+
+            <!-- Ramadan tools -->
+            <div class="tt-sidebar__nav spa-tools-nav">
+                <h6 class="tt-sidebar__nav-title to-collapse" data-i18n="tools">Outils Ramadan</h6>
+                <a href="#/prayer" data-route="prayer">
+                    <div class="d-flex align-items-baseline gap-2"><i class="flaticon-history-clock-button"></i><span class="to-collapse" data-i18n="navPrayer">Horaires</span></div>
+                    <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                </a>
+                <a href="#/card" data-route="card">
+                    <div class="d-flex align-items-baseline gap-2"><i class="flaticon-new-post"></i><span class="to-collapse" data-i18n="navCard">Carte de vœux</span></div>
+                    <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                </a>
+                <a href="#/tasbih" data-route="tasbih">
+                    <div class="d-flex align-items-baseline gap-2"><i class="flaticon-plus-button"></i><span class="to-collapse" data-i18n="navTasbih">Tasbih</span></div>
+                    <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                </a>
+                <a href="#/tracker" data-route="tracker">
+                    <div class="d-flex align-items-baseline gap-2"><i class="flaticon-checked"></i><span class="to-collapse" data-i18n="navTracker">Suivi quotidien</span></div>
+                    <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                </a>
+                <!-- opens the Ko-fi donation popup -->
+                <a href="#" role="button" data-open-donate aria-haspopup="dialog" aria-controls="kofi-pop">
+                    <div class="d-flex align-items-baseline gap-2"><i class="flaticon-like"></i><span class="to-collapse" data-i18n="donate">Soutenir</span></div>
+                    <span class="d-block arrow-icon to-collapse"><i class="flaticon-right-arrow"></i></span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- right container -->
+        <div class="tt-container__right">
+            <!-- header -->
+            <header class="tt-header">
+                <a href="#/" class="rm-logo rm-logo--sm d-inline-flex d-md-none" aria-label="Ramadan">
+                    <svg class="rm-logo__mark" aria-hidden="true"><use href="#rm-mark"/></svg>
+                    <span class="rm-logo__text"><span class="rm-logo__name">Ramadan</span></span>
+                </a>
+                <div class="position-relative w-100 tt-header__search-wrapper">
+                    <form class="tt-header__search" id="search-form" role="search">
+                        <input type="search" name="tt-search" id="tt-search" data-i18n-ph="searchPh" data-i18n-aria="search" aria-label="Recherche" placeholder="Rechercher…" autocomplete="off">
+                        <button type="submit" data-i18n-aria="search" aria-label="Recherche"><i class="flaticon-search"></i></button>
+                    </form>
+                    <div class="tt-header-search-suggestion" id="search-suggestions"></div>
+                </div>
+                <div class="tt-header__right">
+                    <div class="spa-lang" role="group" data-i18n-aria="lang" aria-label="Langue">
+                        <button type="button" data-lang="fr" aria-pressed="true">FR</button>
+                        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+                        <button type="button" data-lang="ar" aria-pressed="false" class="ar">ع</button>
+                    </div>
+                    <button class="d-inline-block d-md-none tt-mobile-search-btn" data-i18n-aria="search" aria-label="Recherche"><i class="flaticon-search"></i></button>
+                    <button class="tt-sidebar-toggler d-inline-flex d-lg-none" data-i18n-aria="menu" aria-label="Menu"><i class="flaticon-menu"></i></button>
+                </div>
+            </header>
+
+            <!-- categories in mobile (home only) -->
+            <div class="tt-categories-mobile-container mb-md-0 mb-4"></div>
+
+            <!-- current page is rendered here by app.js -->
+            <main id="app-view" class="spa-view" tabindex="-1"></main>
+
+            <!-- footer -->
+            <footer class="tt-footer">
+                <div class="tt-footer-container">
+                    <div class="tt-footer-top">
+                        <a href="#/" class="rm-logo rm-logo--lg" aria-label="Ramadan — رمضان كريم">
+                            <svg class="rm-logo__mark" aria-hidden="true"><use href="#rm-mark"/></svg>
+                            <span class="rm-logo__text">
+                                <span class="rm-logo__name">Ramadan</span>
+                                <span class="rm-logo__sub">رمضان كريم</span>
+                            </span>
+                        </a>
+                        <div class="tt-footer-top__links">
+                            <a href="#/" data-i18n="home">Accueil</a>
+                            <a href="#/category" data-i18n="movies">Vidéos</a>
+                            <a href="#/shorts" data-i18n="shorts">Shorts</a>
+                        </div>
+                    </div>
+                    <div class="tt-footer-bottom">
+                        <div class="row row-cols-xl-3 align-items-end">
+                            <div class="col-xl col-md-6 col-12 order-2 order-xl-1">
+                                <p class="tt-footer-bottom-side tt-footer-bottom-copyright mb-0" data-i18n="copyright">Copyright Ramadan-kareem.tn</p>
+                            </div>
+                            <div class="col-xl order-1 order-xl-2">
+                                <div class="tt-footer-socials">
+                                    <a href="#" aria-label="Facebook"><i class="flaticon-facebook"></i></a>
+                                    <a href="#" aria-label="X"><i class="flaticon-twitter"></i></a>
+                                    <a href="#" aria-label="Instagram"><i class="flaticon-social-media"></i></a>
+                                    <a href="#" aria-label="YouTube"><i class="flaticon-youtube"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-xl col-md-6 col-12 order-3">
+                                <div class="tt-footer-bottom-side tt-footer-bottom-links">
+                                    <a href="#" data-i18n="terms">Conditions d’utilisation</a>
+                                    <a href="#" data-i18n="privacy">Confidentialité</a>
+                                    <a href="#" data-i18n="license">Licence</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- libraries JS -->
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- the whole app: translations + data + router + pages -->
+    <script src="app.js"></script>
+
+    <!-- Google sign-in (kept from the previous index.html) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <div id="g_id_onload"
+        data-client_id="712834849325-kl76u7ep17cmbk7ku0ec45lm51980apd.apps.googleusercontent.com"
+        data-callback="handleLogin">
+    </div>
+    <div class="g_id_signin"></div>
+</body>
+</html>
